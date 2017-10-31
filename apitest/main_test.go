@@ -59,7 +59,7 @@ func TestGetNonExistentUser(t *testing.T) {
 func TestCreateUser(t *testing.T) {
 	clearTable()
 
-	payload := []byte(`{"name": test, "age": 30}`)
+	payload := []byte(`{"name": "test", "age": 30}`)
 
 	req, _ := http.NewRequest("POST", "/create", bytes.NewBuffer(payload))
 	response := executeRequest(req)

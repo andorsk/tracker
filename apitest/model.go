@@ -47,6 +47,7 @@ func getUsers(db *sql.DB, start, count int) ([]User, error) {
 	}
 
 	defer rows.Close()
+
 	users := []User{}
 	for rows.Next() {
 		var u User
