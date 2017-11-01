@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"tracker/controller/user"
 
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
 )
 
@@ -22,17 +22,23 @@ func (s *Server) Initialize(user, password, dbname string) {
 	s.DB, err = sql.Open("mysql", connectionString)
 
 	if err != nil {
-		log.Fata(err)
+		log.Fatal(err)
 	}
 	s.Router = mux.NewRouter()
 	s.InitializeRoutes()
 }
 
 func (s *Server) Run(addr string) {
-	log.Fatal(http.ListenAndServe(addr, a.Router))
+	log.Fatal(http.ListenAndServe(addr, s.Router))
+}
+
+func (s *Server) AccessRoot(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(201)
+	w.Write([]byte("You made it to the end"))
 }
 
 func (s *Server) InitializeRoutes() {
 	fmt.Println("Initalizing Routes")
-	s.Router.HandleFunc("/user/*", user.UserController.InitializeRoutes(s.Router))
+	s.Router.HandleFunc("/", s.AccessRoot)
 }

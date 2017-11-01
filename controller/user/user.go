@@ -126,11 +126,10 @@ func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 	w.Write(response)
 }
 
-func (a *UserController) InitializeRoutes(router *mux.Router) {
-	fmt.Println("Initialized the routes")
-	router.HandleFunc("/users", a.getUsers).Methods("GET")
-	router.HandleFunc("/create", a.createUser).Methods("POST")
-	router.HandleFunc("/user/{id:[0-9]+}", a.getUser).Methods("GET")
+func (a *UserController) InitializeRoutes(r *mux.Router) {
+	r.HandleFunc("/users", a.getUsers).Methods("GET")
+	r.HandleFunc("/create", a.createUser).Methods("POST")
+	r.HandleFunc("/user/{id:[0-9]+}", a.getUser).Methods("GET")
 }
 
 func (a *UserController) InitializeRoutesNoRouter() {
