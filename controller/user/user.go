@@ -1,13 +1,13 @@
 package user
 
 import (
-	umodel "andortracker/model/user"
 	"database/sql"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"strconv"
+	umodel "tracker/model/user"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
@@ -29,7 +29,7 @@ func (a *UserController) Initialize(user, password, dbname string) {
 	}
 
 	a.Router = mux.NewRouter()
-	a.InitializeRoutes()
+	a.InitializeRoutesNoRouter()
 }
 
 func (a *UserController) Run(addr string) {
@@ -126,11 +126,16 @@ func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 	w.Write(response)
 }
 
-func (a *UserController) InitializeRoutes() {
+func (a *UserController) InitializeRoutes(router *mux.Router) {
+	fmt.Println("Initialized the routes")
+	router.HandleFunc("/users", a.getUsers).Methods("GET")
+	router.HandleFunc("/create", a.createUser).Methods("POST")
+	router.HandleFunc("/user/{id:[0-9]+}", a.getUser).Methods("GET")
+}
+
+func (a *UserController) InitializeRoutesNoRouter() {
 	fmt.Println("Initialized the routes")
 	a.Router.HandleFunc("/users", a.getUsers).Methods("GET")
 	a.Router.HandleFunc("/create", a.createUser).Methods("POST")
 	a.Router.HandleFunc("/user/{id:[0-9]+}", a.getUser).Methods("GET")
-	//a.Router.HandleFunc("/user/{id:[0-9]+}", a.updateUser).Methods("PUT")
-	//	a.Router.HandleFunc("/user/{id:[0-9]+}", a.deleteUser).Methods("DELETE")
 }
