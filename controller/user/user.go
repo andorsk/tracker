@@ -1,6 +1,7 @@
-package main
+package user
 
 import (
+	umodel "andortracker/model/user"
 	"database/sql"
 	"encoding/json"
 	"fmt"
@@ -12,12 +13,12 @@ import (
 	"github.com/gorilla/mux"
 )
 
-type App struct {
+type UserController struct {
 	Router *mux.Router
 	DB     *sql.DB
 }
 
-func (a *App) Initialize(user, password, dbname string) {
+func (a *UserController) Initialize(user, password, dbname string) {
 	connectionString := fmt.Sprintf("%s:%s@/%s", user, password, dbname)
 
 	var err error
@@ -31,12 +32,12 @@ func (a *App) Initialize(user, password, dbname string) {
 	a.InitializeRoutes()
 }
 
-func (a *App) Run(addr string) {
+func (a *UserController) Run(addr string) {
 	log.Fatal(http.ListenAndServe(addr, a.Router))
 }
 
-func (a *App) createUser(w http.ResponseWriter, r *http.Request) {
-	var u User
+func (a *UserController) createUser(w http.ResponseWriter, r *http.Request) {
+	var u umodel.User
 	decoder := json.NewDecoder(r.Body)
 
 	if err := decoder.Decode(&u); err != nil {
@@ -46,28 +47,28 @@ func (a *App) createUser(w http.ResponseWriter, r *http.Request) {
 
 	defer r.Body.Close()
 
-	if err := u.createUser(a.DB); err != nil {
+	if err := u.CreateUser(a.DB); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 	respondWithJSON(w, http.StatusCreated, u)
 }
 
-func getUser(db *sql.DB, id int) (User, error) {
+func getUser(db *sql.DB, id int) (umodel.User, error) {
 	statement := fmt.Sprintf("SELECT is FROM user where id = %d", id)
 	row, err := db.Query(statement)
 
 	if err != nil {
-		return User{}, err
+		return umodel.User{}, err
 	}
 
 	defer row.Close()
-	user := User{}
+	user := umodel.User{}
 
 	for row.Next() {
-		var u User
+		var u umodel.User
 		if err := row.Scan(&u.ID, &u.Name, &u.Age); err != nil {
-			return User{}, err
+			return umodel.User{}, err
 		}
 		user = u
 	}
@@ -76,15 +77,15 @@ func getUser(db *sql.DB, id int) (User, error) {
 
 }
 
-func (a *App) getUser(w http.ResponseWriter, r *http.Request) {
+func (a *UserController) getUser(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid user ID")
 		return
 	}
-	u := User{ID: id}
-	if err := u.getUser(a.DB); err != nil {
+	u := umodel.User{ID: id}
+	if err := u.GetUser(a.DB); err != nil {
 		switch err {
 		case sql.ErrNoRows:
 			respondWithError(w, http.StatusNotFound, "User not found")
@@ -96,7 +97,7 @@ func (a *App) getUser(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, u)
 }
 
-func (a *App) getUsers(w http.ResponseWriter, r *http.Request) {
+func (a *UserController) getUsers(w http.ResponseWriter, r *http.Request) {
 	count, _ := strconv.Atoi(r.FormValue("count"))
 	start, _ := strconv.Atoi(r.FormValue("start"))
 	if count > 10 || count < 1 {
@@ -105,7 +106,7 @@ func (a *App) getUsers(w http.ResponseWriter, r *http.Request) {
 	if start < 0 {
 		start = 0
 	}
-	users, err := getUsers(a.DB, start, count)
+	users, err := umodel.GetUsers(a.DB, start, count)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -125,7 +126,7 @@ func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 	w.Write(response)
 }
 
-func (a *App) InitializeRoutes() {
+func (a *UserController) InitializeRoutes() {
 	fmt.Println("Initialized the routes")
 	a.Router.HandleFunc("/users", a.getUsers).Methods("GET")
 	a.Router.HandleFunc("/create", a.createUser).Methods("POST")

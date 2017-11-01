@@ -10,14 +10,12 @@ import (
 	"os"
 	"strconv"
 	"testing"
-
-	uapp	"andortracker/controller/user"
 )
 
-var a uapp.App
+var a UserController
 
 func TestMain(m *testing.M) {
-	a = App{}
+	a = UserController{}
 	a.Initialize("root", "c0raline", "rest_api_example")
 	ensureTableExists()
 

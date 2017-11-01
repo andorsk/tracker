@@ -1,4 +1,4 @@
-package main
+package user
 
 import (
 	"database/sql"
@@ -11,7 +11,7 @@ type User struct {
 	Age  int    `json:"age"`
 }
 
-func (u *User) createUser(db *sql.DB) error {
+func (u *User) CreateUser(db *sql.DB) error {
 
 	statement := fmt.Sprintf("INSERT INTO users(name, age) VALUES ('%s', '%d')", u.Name, u.Age)
 	_, err := db.Exec(statement)
@@ -27,18 +27,18 @@ func (u *User) createUser(db *sql.DB) error {
 	return nil
 }
 
-func (u *User) updateUser(db *sql.DB) error {
+func (u *User) UpdateUser(db *sql.DB) error {
 	statement := fmt.Sprintf("UPDATE users SET name='%s', age='%d', WHERE id='%d'", u.Name, u.Age, u.ID)
 	_, err := db.Exec(statement)
 	return err
 }
 
-func (u *User) getUser(db *sql.DB) error {
+func (u *User) GetUser(db *sql.DB) error {
 	statement := fmt.Sprintf("SELECT name, age FROM users WHERE id=%d", u.ID)
 	return db.QueryRow(statement).Scan(&u.Name, &u.Age)
 }
 
-func getUsers(db *sql.DB, start, count int) ([]User, error) {
+func GetUsers(db *sql.DB, start, count int) ([]User, error) {
 	statement := fmt.Sprintf("SELECT id,name,age FROM users LIMIT %d OFFSET %d", count, start)
 	rows, err := db.Query(statement)
 
@@ -59,7 +59,7 @@ func getUsers(db *sql.DB, start, count int) ([]User, error) {
 	return users, nil
 }
 
-func (u *User) deleteUser(db *sql.DB) error {
+func (u *User) DeleteUser(db *sql.DB) error {
 	statement := fmt.Sprintf("DELETE FROM user WHERE id=%d", u.ID)
 	_, err := db.Exec(statement)
 	return err
