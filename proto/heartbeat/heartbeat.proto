@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package heartbeat;
+
+//Using Sequential ID not UUID. Potentially redesign.
+message HeartBeat {
+	int64 Timestamp = 1;
+	Location Location = 2;
+	int64 UserID = 3;	
+}
+
+//Upon a stream most of these will not be filled at the time. They will be completed post process
+message Location {
+	double Long = 1;
+	double Lat = 2;
+	string City = 3;
+	string Country = 4;
+	string Address = 5;
+	string Address2 = 6;
+	string Zip = 7;
+	string State = 8;
+}
+
+message HeartBeats {
+	repeated HeartBeat heartbeats = 1;
+}
