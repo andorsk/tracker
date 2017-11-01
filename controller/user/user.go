@@ -18,20 +18,6 @@ type UserController struct {
 	DB     *sql.DB
 }
 
-func (a *UserController) Initialize(user, password, dbname string) {
-	connectionString := fmt.Sprintf("%s:%s@/%s", user, password, dbname)
-
-	var err error
-	a.DB, err = sql.Open("mysql", connectionString)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	a.Router = mux.NewRouter()
-	a.InitializeRoutesNoRouter()
-}
-
 func (a *UserController) Run(addr string) {
 	log.Fatal(http.ListenAndServe(addr, a.Router))
 }
@@ -130,11 +116,4 @@ func (a *UserController) InitializeRoutes(r *mux.Router) {
 	r.HandleFunc("/users", a.getUsers).Methods("GET")
 	r.HandleFunc("/create", a.createUser).Methods("POST")
 	r.HandleFunc("/user/{id:[0-9]+}", a.getUser).Methods("GET")
-}
-
-func (a *UserController) InitializeRoutesNoRouter() {
-	fmt.Println("Initialized the routes")
-	a.Router.HandleFunc("/users", a.getUsers).Methods("GET")
-	a.Router.HandleFunc("/create", a.createUser).Methods("POST")
-	a.Router.HandleFunc("/user/{id:[0-9]+}", a.getUser).Methods("GET")
 }

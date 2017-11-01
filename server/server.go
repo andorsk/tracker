@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"tracker/controller/user"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
@@ -16,7 +17,7 @@ type Server struct {
 }
 
 func (s *Server) Initialize(user, password, dbname string) {
-	connectionString := fmt.Sprintf("%s:%s:%s", user, password, dbname)
+	connectionString := fmt.Sprintf("%s:%s@/%s", user, password, dbname)
 
 	var err error
 	s.DB, err = sql.Open("mysql", connectionString)
@@ -41,4 +42,6 @@ func (s *Server) AccessRoot(w http.ResponseWriter, r *http.Request) {
 func (s *Server) InitializeRoutes() {
 	fmt.Println("Initalizing Routes")
 	s.Router.HandleFunc("/", s.AccessRoot)
+	uc := user.UserController{Router: s.Router, DB: s.DB}
+	uc.InitializeRoutes(s.Router)
 }
