@@ -45,7 +45,16 @@ func ParseJSONFile(file string) (map[string]interface{}, error) {
 //TODO: Prettify JSON
 func JsonWriter(jin, outfile string) {
 	ioutil.WriteFile(outfile, []byte(jin), 0644)
-	fmt.Sprintf("Wrote Json File to %s", outfile)
+	fmt.Printf("Wrote Json File to %s", outfile)
+}
+
+func ReadConfig(configfile string) (*config.Config, error) {
+	s, err := ioutil.ReadFile(configfile)
+	//s, err := ioutil.ReadAll(outfile)
+	check(err)
+	config, err := Json2Config(string(s))
+	check(err)
+	return config, nil
 }
 
 func check(e error) {
