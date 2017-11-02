@@ -33,6 +33,28 @@ func (u *User) UpdateUser(db *sql.DB) error {
 	return err
 }
 
+func GetUser(db *sql.DB, id int) (User, error) {
+	statement := fmt.Sprintf("SELECT is FROM user where id = %d", id)
+	row, err := db.Query(statement)
+
+	if err != nil {
+		return umodel.User{}, err
+	}
+
+	defer row.Close()
+	user := umodel.User{}
+
+	for row.Next() {
+		var u umodel.User
+		if err := row.Scan(&u.ID, &u.Name, &u.Age); err != nil {
+			return umodel.User{}, err
+		}
+		user = u
+	}
+
+	return user, nil
+}
+
 func (u *User) GetUser(db *sql.DB) error {
 	statement := fmt.Sprintf("SELECT name, age FROM users WHERE id=%d", u.ID)
 	return db.QueryRow(statement).Scan(&u.Name, &u.Age)

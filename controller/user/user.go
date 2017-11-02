@@ -3,8 +3,6 @@ package user
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 	umodel "tracker/model/user"
@@ -16,10 +14,6 @@ import (
 type UserController struct {
 	Router *mux.Router
 	DB     *sql.DB
-}
-
-func (a *UserController) Run(addr string) {
-	log.Fatal(http.ListenAndServe(addr, a.Router))
 }
 
 func (a *UserController) createUser(w http.ResponseWriter, r *http.Request) {
@@ -38,29 +32,6 @@ func (a *UserController) createUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	respondWithJSON(w, http.StatusCreated, u)
-}
-
-func getUser(db *sql.DB, id int) (umodel.User, error) {
-	statement := fmt.Sprintf("SELECT is FROM user where id = %d", id)
-	row, err := db.Query(statement)
-
-	if err != nil {
-		return umodel.User{}, err
-	}
-
-	defer row.Close()
-	user := umodel.User{}
-
-	for row.Next() {
-		var u umodel.User
-		if err := row.Scan(&u.ID, &u.Name, &u.Age); err != nil {
-			return umodel.User{}, err
-		}
-		user = u
-	}
-
-	return user, nil
-
 }
 
 func (a *UserController) getUser(w http.ResponseWriter, r *http.Request) {
