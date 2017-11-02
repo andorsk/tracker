@@ -1,7 +1,1 @@
-{
-	"DB_CONFIG": {
-		"db": "mysql",
-		"user": "root",
-		"password": "test"
-	}
-}
+{"dB":{"type":"mysql","user":"test","password":"user"}}

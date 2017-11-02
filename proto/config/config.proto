@@ -4,8 +4,15 @@ package config;
 
 message Config {
 	DB_CONFIG DB = 1;
+	USER_CONFIG USER = 2; 
 }
 
+message USER_CONFIG {
+	string Name = 1; 
+	string Address = 2;
+	string Address2 = 3;
+	int64 Last_Seen = 4; 
+}
 
 message DB_CONFIG {
 	string Type = 1;
