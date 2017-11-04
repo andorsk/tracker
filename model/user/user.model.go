@@ -7,7 +7,7 @@ import (
 )
 
 type UserModelInterface struct {
-	ModelInterface interface{}
+	ObjectModelInterface interface{}
 }
 
 func Push(db *sql.DB, u *umodel.User) error {

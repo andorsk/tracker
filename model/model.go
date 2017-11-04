@@ -1,9 +1,8 @@
 package model
 
-type ModelInterface interface {
+type ObjectModelInterface interface {
 	Push() error
 	Update() error
 	Get() error
-	Gets() error
-	Detete() error
+	Delete() error
 }
