@@ -20,8 +20,8 @@ func (h *HeartbeatController) GetHeartbeats(w http.ResponseWriter, r *http.Reque
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["uid"])
 	check(err, "Failed to parse DB string")
-	statement := fmt.Sprintf("SELECT * FROM heartbeats WHERE uid = %s", id)
-	fmt.Println("Querying", statement)
+
+	fmt.Println("Que\rying", statement)
 }
 
 func check(err error, message interface{}) {

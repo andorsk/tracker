@@ -2,24 +2,23 @@ syntax = "proto3";
 
 package heartbeat;
 
-//TODO:Using Sequential ID not UUID. Potentially redesign.
-message HeartBeat {
+import "tracker/proto/location/location.proto";
+import "tracker/proto/uuid/uuid.proto";
+
+//TODO:Using Sequential ID not UUID. Potentially redesign. Model will be time index
+message Heartbeat {
 	int64 Timestamp = 1;
-	Location Location = 2;
-	int64 UserID = 3;	
+	int32 Offset = 2; //Theoretically we only need this 
+ 	location.Location Location = 3;
+	int64 UserId = 4;
+	double Long = 5;
+	double Lat = 6;
+	double Altitude = 7;
 }
 
-message Location {
-	double Long = 1;
-	double Lat = 2;
-	string City = 3;
-	string Country = 4;
-	string Address = 5;
-	string Address2 = 6;
-	string Zip = 7;
-	string State = 8;
-}
-
-message HeartBeats {
-	repeated HeartBeat heartbeats = 1;
+message HeartbeatTrack {
+	uuid.UUID Uuid = 1;
+	repeated Heartbeat Heartbeats = 2;
+	int64 Starttime = 3;
+	int32 UserId = 4; 
 }

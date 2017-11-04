@@ -48,7 +48,7 @@ func TestConfigReader(t *testing.T) {
 	json, _ := Config2Json(conf)
 	JsonWriter(json, outfile)
 
-	conf, err := ReadConfig(outfile)
+	conf, err := LoadConfig(outfile)
 	if err != nil {
 		fmt.Println("There was an error reading the file")
 	}

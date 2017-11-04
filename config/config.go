@@ -48,7 +48,7 @@ func JsonWriter(jin, outfile string) {
 	fmt.Printf("Wrote Json File to %s", outfile)
 }
 
-func ReadConfig(configfile string) (*config.Config, error) {
+func LoadConfig(configfile string) (*config.Config, error) {
 	s, err := ioutil.ReadFile(configfile)
 	//s, err := ioutil.ReadAll(outfile)
 	check(err)

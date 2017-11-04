@@ -5,7 +5,8 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
-	umodel "tracker/model/user"
+	umi "tracker/model/user"
+	umodel "tracker/proto/user"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
@@ -27,7 +28,7 @@ func (a *UserController) createUser(w http.ResponseWriter, r *http.Request) {
 
 	defer r.Body.Close()
 
-	if err := u.CreateUser(a.DB); err != nil {
+	if err := umi.Push(a.DB, &u); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -36,13 +37,15 @@ func (a *UserController) createUser(w http.ResponseWriter, r *http.Request) {
 
 func (a *UserController) getUser(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	id, err := strconv.Atoi(vars["id"])
+	id, err := strconv.ParseInt(vars["id"], 10, 64)
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid user ID")
 		return
 	}
 	u := umodel.User{ID: id}
-	if err := u.GetUser(a.DB); err != nil {
+
+	_, err = umi.Get(a.DB, id)
+	if err != nil {
 		switch err {
 		case sql.ErrNoRows:
 			respondWithError(w, http.StatusNotFound, "User not found")
@@ -63,7 +66,7 @@ func (a *UserController) getUsers(w http.ResponseWriter, r *http.Request) {
 	if start < 0 {
 		start = 0
 	}
-	users, err := umodel.GetUsers(a.DB, start, count)
+	users, err := umi.GetUsers(a.DB, start, count)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return

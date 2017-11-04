@@ -1,0 +1,8 @@
+development: 
+    driver: mysql
+    open: user=root dbname=rest_api_example
+    dialect: mysql
+production:
+    driver: mysql
+    open: user=root dbname=rest_api_example
+    dialect: mysql

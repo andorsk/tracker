@@ -1,0 +1,15 @@
+syntax="proto3";
+package location;
+
+//Location is the seralized form. Not used for querying because it is slow. 
+message Location {
+	double Long = 1;
+	double Lat = 2;
+	double Altitude = 3;
+	string City = 4;
+	string Country = 5;
+	string Address = 6;
+	string Address2 = 7;
+	string Zip = 8;
+	string State = 9;
+}
