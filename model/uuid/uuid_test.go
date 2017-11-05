@@ -3,6 +3,8 @@ package uuid
 import (
 	"fmt"
 	"testing"
+
+	guuid "github.com/satori/go.uuid"
 )
 
 func TestNewUUID(t *testing.T) {
@@ -16,12 +18,14 @@ func TestNewUUID(t *testing.T) {
 func TestParseUUID(t *testing.T) {
 	uid, err := NewUUID()
 	puid, err := ParseUUID(uid)
+	val := puid.Value
 	if err != nil {
 		t.Errorf("Failed to parse UUID")
 	}
+	res, _ := guuid.FromBytes(val)
 
-	if puid.String() != uid {
-		t.Errorf("Parsed UUID is not equal to original UUID. Failed")
+	if res.String() != uid {
+		t.Errorf("Parsed UUID is not equal to original UUID. Failed \n From  %v : To  %v", res.String(), puid)
 	}
 
 }

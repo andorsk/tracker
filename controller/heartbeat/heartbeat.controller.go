@@ -20,23 +20,28 @@ type HeartbeatController struct {
 	DB     *sql.DB
 }
 
-//get the heartbeats for a specific user
+//get the heartbeats for a specific user. ONLY one user at a time.
 func (h *HeartbeatController) GetHeartbeatsByUser(w http.ResponseWriter, r *http.Request) {
 
-	vars := mux.Vars(r)
-	userid, err := strconv.Atoi(vars["id"])
+	vars := r.URL.Query()
+	_, err := strconv.Atoi(vars["UserId"][0])
 	if err != nil {
-		respondWithError(w, http.StatusBadRequest, "Invalid User Id")
+		respondWithError(w, http.StatusBadRequest, "Invalid User Id. Please make sure to specify number for user id")
 	}
 
-	var heartbeats heartbeat.HeartbeatTrack
+	if len(vars["UserId"]) > 1 {
+		respondWithError(w, http.StatusBadRequest, "Please make sure to only have one user id")
+	}
 
-	_, err = hmi.Get(h.DB, userid)
+	var heartbeats []heartbeat.HeartbeatTrack
+
+	heartbeats, err = hmi.Get(h.DB, "UserId", vars["UserId"][0])
 
 	if err != nil {
 		switch err {
 		case sql.ErrNoRows:
 			respondWithError(w, http.StatusNotFound, "User not found")
+
 		default:
 			respondWithError(w, http.StatusInternalServerError, err.Error())
 		}
@@ -70,13 +75,13 @@ func respondWithError(w http.ResponseWriter, code int, message string) {
 
 func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 	response, _ := json.Marshal(payload)
-
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
 	w.Write(response)
 }
 
 func (h *HeartbeatController) InitializeRoutes(r *mux.Router) {
-	r.HandleFunc("/hb-api/{id:[0-9]+}", h.GetHeartbeatsByUser).Methods("GET")
-	r.HandleFunc("/hb-api", h.PushHeartbeat).Methods("POST")
+	s := r.PathPrefix("/hb-api").Subrouter()
+	s.HandleFunc("", h.GetHeartbeatsByUser).Methods("GET")
+	//s.HandleFunc("", h.PushHeartbeat).Methods("POST")
 }
