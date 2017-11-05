@@ -11,8 +11,8 @@ message Heartbeat {
 	int32 Offset = 2; //Theoretically we only need this 
  	location.Location Location = 3;
 	int64 UserId = 4;
-	double Long = 5;
-	double Lat = 6;
+	double Longitude = 5;
+	double Latitude = 6;
 	double Altitude = 7;
 }
 

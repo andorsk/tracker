@@ -7,7 +7,7 @@ import (
 	"tracker/proto/heartbeat"
 )
 
-func PushHeartbeat(db *sql.DB, hb heartbeat.Heartbeat) error {
+func Push(db *sql.DB, hb heartbeat.Heartbeat) error {
 	statement := fmt.Sprintf("INSERT INTO heartbeats VALUES ('%d', '%s', '%d')", hb.UserId, hb.Location, hb.Timestamp)
 
 	_, err := db.Exec(statement)
@@ -20,10 +20,12 @@ func PushHeartbeat(db *sql.DB, hb heartbeat.Heartbeat) error {
 	return nil
 }
 
-func GetHeartbeats(db *sql.DB, id int) error {
-	statement := fmt.Sprintf("SELECT * FROM heartbeats WHERE uid = %s", id)
+func Get(db *sql.DB, id int) (heartbeat.Heartbeat, error) {
+	statement := fmt.Sprintf("SELECT * FROM heartbeats WHERE uid = %d", id)
+	fmt.Println("Statment", statement)
+	return heartbeat.Heartbeat{}, nil
 }
 
-func DeleteHeartbeats(db *sql.Db, id int) error {
-
+func DeleteHeartbeats(db *sql.DB, id int) error {
+	return nil
 }

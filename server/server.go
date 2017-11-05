@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"tracker/controller/heartbeat"
 	"tracker/controller/user"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -44,4 +45,6 @@ func (s *Server) InitializeRoutes() {
 	s.Router.HandleFunc("/", s.AccessRoot)
 	uc := user.UserController{Router: s.Router, DB: s.DB}
 	uc.InitializeRoutes(s.Router)
+	hb := heartbeat.HeartbeatController{Router: s.Router, DB: s.DB}
+	hb.InitializeRoutes(s.Router)
 }
