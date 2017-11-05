@@ -15,7 +15,6 @@ func TestCreateTable(t *testing.T) {
 	}
 	fmt.Println("Initalizing with", conf.GetDB().User, ":", conf.GetDB().Password)
 	s.Initialize(conf.GetDB().User, conf.GetDB().Password, "rest_api_example")
-
+	gm.DropTables(s.DB)
 	gm.CreateTables(s.DB)
-
 }

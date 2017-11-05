@@ -1,6 +1,6 @@
 package migration
 
-import 
+import "
 	// Setup the goose configuration
 var migrateConf &goose.DBConf{
 	MigrationsDir: config.Conf.MigrationsPath,

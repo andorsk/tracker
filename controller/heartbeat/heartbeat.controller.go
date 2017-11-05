@@ -16,9 +16,10 @@ type HeartbeatController struct {
 	DB     *sql.DB
 }
 
+//get the heartbeats for a specific user
 func (h *HeartbeatController) GetHeartbeats(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	id, err := strconv.Atoi(vars["uid"])
+	id, err := strconv.Atoi(vars["UserId"])
 	check(err, "Failed to parse DB string")
 	statement := fmt.Sprintf("SELECT * FROM heartbeats WHERE uid = %s", id)
 	fmt.Println("Querying", statement)

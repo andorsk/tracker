@@ -18,7 +18,7 @@ func Push(db *sql.DB, u *umodel.User) error {
 	if err != nil {
 		return nil
 	}
-	err = db.QueryRow("SELECT LAST_INSERT_ID()").Scan(&u.ID)
+	err = db.QueryRow("SELECT LAST_INSERT_ID()").Scan(&u.UserId)
 
 	if err != nil {
 		return err
@@ -27,7 +27,7 @@ func Push(db *sql.DB, u *umodel.User) error {
 }
 
 func Update(db *sql.DB, u *umodel.User) error {
-	statement := fmt.Sprintf("UPDATE users SET name='%s', age='%d', WHERE id='%d'", u.Name, u.Age, u.ID)
+	statement := fmt.Sprintf("UPDATE users SET name='%s', age='%d', WHERE id='%d'", u.Name, u.Age, u.UserId)
 	_, err := db.Exec(statement)
 	return err
 }
@@ -45,7 +45,7 @@ func Get(db *sql.DB, id int64) (umodel.User, error) {
 
 	for row.Next() {
 		var u umodel.User
-		if err := row.Scan(&u.ID, &u.Name, &u.Age); err != nil {
+		if err := row.Scan(&u.UserId, &u.Name, &u.Age); err != nil {
 			return umodel.User{}, err
 		}
 		user = u
@@ -57,7 +57,7 @@ func Get(db *sql.DB, id int64) (umodel.User, error) {
 func (u *UserModelInterface) GetUser(db *sql.DB, id int) error {
 	statement := fmt.Sprintf("SELECT name, age FROM users WHERE id=%d", id)
 	var user umodel.User
-	return db.QueryRow(statement).Scan(&user.ID, &user.Name, &user.Age)
+	return db.QueryRow(statement).Scan(&user.UserId, &user.Name, &user.Age)
 }
 
 func GetUsers(db *sql.DB, start, count int) ([]umodel.User, error) {
@@ -73,7 +73,7 @@ func GetUsers(db *sql.DB, start, count int) ([]umodel.User, error) {
 	users := []umodel.User{}
 	for rows.Next() {
 		var u umodel.User
-		if err := rows.Scan(&u.ID, &u.Name, &u.Age); err != nil {
+		if err := rows.Scan(&u.UserId, &u.Name, &u.Age); err != nil {
 			return nil, err
 		}
 		users = append(users, u)
@@ -82,7 +82,7 @@ func GetUsers(db *sql.DB, start, count int) ([]umodel.User, error) {
 }
 
 func (u *UserModelInterface) Delete(db *sql.DB, user *umodel.User) error {
-	statement := fmt.Sprintf("DELETE FROM user WHERE id=%d", user.ID)
+	statement := fmt.Sprintf("DELETE FROM user WHERE id=%d", user.UserId)
 	_, err := db.Exec(statement)
 	return err
 }

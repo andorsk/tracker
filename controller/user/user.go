@@ -42,7 +42,7 @@ func (a *UserController) getUser(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, http.StatusBadRequest, "Invalid user ID")
 		return
 	}
-	u := umodel.User{ID: id}
+	u := umodel.User{UserId: id}
 
 	_, err = umi.Get(a.DB, id)
 	if err != nil {
