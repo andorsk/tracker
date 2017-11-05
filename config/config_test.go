@@ -10,9 +10,14 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+var sampledb string = "rest_api_example"
+var samplepass string = "c0raline"
+var sampletype string = "mysql"
+var sampleuser string = "root"
+
 func TestConfig2Json(t *testing.T) {
 	conf := new(config.Config)
-	conf.DB = &config.DB_CONFIG{"mysql", "test", "user"}
+	conf.DB = &config.DB_CONFIG{sampletype, sampleuser, samplepass, sampledb}
 	_, err := Config2Json(conf)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -21,7 +26,7 @@ func TestConfig2Json(t *testing.T) {
 
 func TestJson2Config(t *testing.T) {
 	conf := new(config.Config)
-	conf.DB = &config.DB_CONFIG{"mysql", "test", "user"}
+	conf.DB = &config.DB_CONFIG{sampletype, sampleuser, samplepass, sampledb}
 	json, err := Config2Json(conf)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -44,7 +49,7 @@ func TestConfigReader(t *testing.T) {
 	conf := new(config.Config)
 
 	pass := "tpass"
-	conf.DB = &config.DB_CONFIG{"mysql", "tuser", pass}
+	conf.DB = &config.DB_CONFIG{sampletype, sampleuser, pass, sampledb}
 	json, _ := Config2Json(conf)
 	JsonWriter(json, outfile)
 
