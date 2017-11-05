@@ -10,17 +10,29 @@ import (
 	"os"
 	"strconv"
 	"testing"
+	"tracker/config"
+	"tracker/server"
 )
 
-var a UserController
+var s server.Server
+
+var uc UserController
 
 func TestMain(m *testing.M) {
-	a = UserController{}
-	a.Initialize("root", "c0raline", "rest_api_example")
-	ensureTableExists()
+	s = server.Server{}
+	uc = UserController{}
 
+	conf, err := config.LoadConfig("../../config/config.json")
+	if err != nil {
+		log.Fatal("Failed to load config")
+	}
+
+	s.Initialize(conf.GetDB().User, conf.GetDB().Password, conf.GetDB().DBName)
+	//	ensureTableExists()
 	code := m.Run()
+	uc.InitializeRoutes(s.Router)
 	clearTable()
+
 	os.Exit(code)
 
 }
@@ -86,7 +98,7 @@ func TestCreateUser(t *testing.T) {
 
 func executeRequest(req *http.Request) *httptest.ResponseRecorder {
 	rr := httptest.NewRecorder()
-	a.Router.ServeHTTP(rr, req)
+	s.Router.ServeHTTP(rr, req)
 	return rr
 }
 
@@ -96,28 +108,17 @@ func checkResponseCode(t *testing.T, expected, actual int) {
 	}
 }
 
-func ensureTableExists() {
-	if _, err := a.DB.Exec(tableCreationQuery); err != nil {
-		log.Fatal(err)
-	}
-}
-
 func addUsers(count int) {
 	if count < 1 {
 		count = 1
 	}
 	for i := 0; i < count; i++ {
 		statement := fmt.Sprintf("INSERT INTO users(name, age) VALUES('%s', %d)", ("User " + strconv.Itoa(i+1)), ((i + 1) * 10))
-		a.DB.Exec(statement)
+		s.DB.Exec(statement)
 	}
 }
 
 func clearTable() {
-	a.DB.Exec("DELETE FROM users")
-	a.DB.Exec("ALTER TABLE users AUTO_INCREMENT = 1")
+	s.DB.Exec("DELETE FROM users")
+	s.DB.Exec("ALTER TABLE users AUTO_INCREMENT = 1")
 }
-
-const tableCreationQuery = `CREATE TABLE IF NOT EXISTS users( id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(50) NOT NULL,
-    age INT NOT NULL
-)`

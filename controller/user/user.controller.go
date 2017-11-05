@@ -3,6 +3,7 @@ package user
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 	umi "tracker/model/user"
@@ -90,4 +91,5 @@ func (a *UserController) InitializeRoutes(r *mux.Router) {
 	r.HandleFunc("/users", a.getUsers).Methods("GET")
 	r.HandleFunc("/create", a.createUser).Methods("POST")
 	r.HandleFunc("/user/{id:[0-9]+}", a.getUser).Methods("GET")
+	fmt.Println("Registered User Routes")
 }
