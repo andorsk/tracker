@@ -1,7 +1,0 @@
-package heartbeat
-
-import (
-	"encoding/json"
-	"net/http"
-	"testing"
-)
