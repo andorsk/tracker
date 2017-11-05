@@ -2,7 +2,6 @@ package heartbeat
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -24,10 +23,8 @@ type HeartbeatController struct {
 //get the heartbeats for a specific user
 func (h *HeartbeatController) GetHeartbeatsByUser(w http.ResponseWriter, r *http.Request) {
 
-	fmt.Println("Getting Heartbeats")
 	vars := mux.Vars(r)
 	userid, err := strconv.Atoi(vars["id"])
-	fmt.Println("Looking for", userid)
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid User Id")
 	}

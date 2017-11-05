@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	umodel "tracker/proto/user"
+	
 )
 
 type UserModelInterface struct {
@@ -79,7 +80,7 @@ func GetUsers(db *sql.DB, start, count int) ([]umodel.User, error) {
 	users := []umodel.User{}
 	for rows.Next() {
 		var u umodel.User
-		if err := rows.Scan(&u.UserId, &u.Name, &u.Age); err != nil {
+xb		if err := rows.Scan(&u.UserId, &u.Name, &u.Age); err != nil {
 			return nil, err
 		}
 		users = append(users, u)

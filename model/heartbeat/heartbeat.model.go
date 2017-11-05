@@ -20,10 +20,34 @@ func Push(db *sql.DB, hb heartbeat.Heartbeat) error {
 	return nil
 }
 
-func Get(db *sql.DB, id int) (heartbeat.Heartbeat, error) {
-	statement := fmt.Sprintf("SELECT * FROM heartbeats WHERE uid = %d", id)
-	fmt.Println("Statment", statement)
-	return heartbeat.Heartbeat{}, nil
+func Get(db *sql.DB, id int) ([]heartbeat.HeartbeatTrack, error) {
+	statement := fmt.Sprintf("SELECT * FROM tracks WHERE UserId = %d", id)
+	rows, err := db.Query(statement)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	hbtracks := []heartbeat.HeartbeatTrack{}
+
+	var count = 0
+
+	for rows.Next() {
+		var hbt heartbeat.HeartbeatTrack
+		if err := rows.Scan(&hbt.Uuid, &hbt.Heartbeats, &hbt.Starttime, &hbt.UserId); err != nil {
+			return nil, err
+		}
+
+		hbtracks = append(hbtracks, hbt)
+	}
+
+	if count == 0 {
+		return nil, sql.ErrNoRows
+	}
+
+	return hbtracks, nil
 }
 
 func DeleteHeartbeats(db *sql.DB, id int) error {

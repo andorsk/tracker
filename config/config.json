@@ -1,1 +1,1 @@
-{"dB":{"type":"mysql","user":"root","password":"c0raline"}}
+{"dB":{"type":"mysql","user":"root","password":"c0raline","dBName":"rest_api_example"}}
