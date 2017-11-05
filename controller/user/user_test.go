@@ -4,42 +4,35 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"strconv"
 	"testing"
 	"tracker/config"
 	"tracker/server"
+
+	log "github.com/sirupsen/logrus"
 )
 
 var s server.Server
-
 var uc UserController
 
-func TestMain(m *testing.M) {
+func init() {
 	s = server.Server{}
-	uc = UserController{}
-
 	conf, err := config.LoadConfig("../../config/config.json")
 	if err != nil {
 		log.Fatal("Failed to load config")
 	}
 
+	fmt.Println("DB is ", conf.GetDB().DBName)
 	s.Initialize(conf.GetDB().User, conf.GetDB().Password, conf.GetDB().DBName)
-	//	ensureTableExists()
-	code := m.Run()
+	uc = UserController{DB: s.DB, Router: s.Router}
 	uc.InitializeRoutes(s.Router)
-	clearTable()
-
-	os.Exit(code)
 
 }
 
 func TestEmptyTable(t *testing.T) {
 	clearTable()
-
 	req, _ := http.NewRequest("GET", "/users", nil)
 	response := executeRequest(req)
 
@@ -71,7 +64,7 @@ func TestGetNonExistentUser(t *testing.T) {
 func TestCreateUser(t *testing.T) {
 	clearTable()
 
-	payload := []byte(`{"name": "test", "age": 30}`)
+	payload := []byte(`{"Name": "test user", "Age": 30}`)
 
 	req, _ := http.NewRequest("POST", "/create", bytes.NewBuffer(payload))
 	response := executeRequest(req)
@@ -81,17 +74,16 @@ func TestCreateUser(t *testing.T) {
 	var m map[string]interface{}
 	json.Unmarshal(response.Body.Bytes(), &m)
 
-	//run checks on create user
-	if m["name"] != "test" {
-		t.Errorf("Expected test user got %v", m["name"])
+	if m["Name"] != "test user" {
+		t.Errorf("Expected test user got %v", m["Name"])
 	}
 
-	if m["age"] != 30.0 {
-		t.Errorf("Expected age of 30 got %v", m["age"])
+	if m["Age"] != 30.0 {
+		t.Errorf("Expected age of 30 got %v", m["Age"])
 	}
 
-	if m["id"] != 1.0 {
-		t.Errorf("Expected id to be 1 got %v", m["id"])
+	if m["UserId"] != 1.0 {
+		t.Errorf("Expected id to be 1 got %v", m["UserId"])
 	}
 
 }
