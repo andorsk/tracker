@@ -18,4 +18,5 @@ message DB_CONFIG {
 	string Type = 1;
 	string User = 2;
 	string Password = 3;
+	string DBName = 4;
 }
