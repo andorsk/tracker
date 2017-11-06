@@ -20,5 +20,5 @@ message HeartbeatTrack {
 	uuid.UUID Uuid = 1;
 	repeated Heartbeat Heartbeats = 2;
 	int64 Starttime = 3;
-	int32 UserId = 4; 
+	int64 UserId = 4; 
 }

@@ -36,7 +36,6 @@ func Get(db *sql.DB, column, criteria string) ([]heartbeat.HeartbeatTrack, error
 
 	hbtracks := []heartbeat.HeartbeatTrack{}
 
-	fmt.Println("Searched for ", statement)
 	for rows.Next() {
 		var hbt heartbeat.HeartbeatTrack
 		var uid []uint8

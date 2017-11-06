@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"testing"
 	"tracker/config"
 	"tracker/proto/heartbeat"
@@ -17,6 +18,9 @@ import (
 
 var s server.Server
 var hb HeartbeatController
+
+const UUIDinstertion = `a427abe0-d359-4bbd-be70-e5a6b83defed`
+const UUIDinstertion2 = `b427abe0-d359-4bbd-be70-e5a6b83defe7`
 
 func init() {
 	s = server.Server{}
@@ -49,28 +53,46 @@ func TestGetHeartbeatForIncorrectUser(t *testing.T) {
 
 }
 
-func TestAddHeartbeat(t *testing.T) {
+func TestAddHeartbeatToNonExistentUser(t *testing.T) {
 	clearTable()
 
-	payload := []byte(`{"Logitude": "12", "Latitude": 1, "UserId": 1, "Timestamp": 1}`)
+	jsonStr := fmt.Sprintf(`{"latitude": %v, "longitude": %v, "timestamp":%v, "userId": %v})`, 1, 1, 1, 45)
+	payload := []byte(jsonStr)
 	req, _ := http.NewRequest("POST", "/hb-api", bytes.NewBuffer(payload))
 	response := executeRequest(req)
-
-	checkResponseCode(t, http.StatusCreated, response.Code)
-
-	var m map[string]string
-	json.Unmarshal(response.Body.Bytes(), &m)
-
-	fmt.Println(m)
-
+	checkResponseCode(t, http.StatusNotFound, response.Code)
 }
 
-const UUIDinstertion = `a427abe0-d359-4bbd-be70-e5a6b83defed`
+func TestAddHeartbeatToExistent(t *testing.T) {
+	addUsers(1)
+	jsonStr := fmt.Sprintf(`{"latitude": %v, "longitude": %v, "timestamp":%v, "userId": %v})`, 1, 1, 1, 1)
+	payload := []byte(jsonStr)
+	req, _ := http.NewRequest("POST", "/hb-api", bytes.NewBuffer(payload))
+	response := executeRequest(req)
+	checkResponseCode(t, http.StatusCreated, response.Code)
+
+}
+func TestAddHeartbeatAgainWithAnalyticThere(t *testing.T) {
+	jsonStr := fmt.Sprintf(`{"latitude": %v, "longitude": %v, "timestamp":%v, "userId": %v})`, 1, 3, 3, 1)
+	payload := []byte(jsonStr)
+	req, _ := http.NewRequest("POST", "/hb-api", bytes.NewBuffer(payload))
+	response := executeRequest(req)
+	checkResponseCode(t, http.StatusCreated, response.Code)
+}
 
 func addHeartBeat() {
-
 	statement := fmt.Sprintf("INSERT INTO tracks(Uuid, UserId, Starttime) VALUES ('%s', '%v', '%v')", UUIDinstertion, 1, 2)
 	s.DB.Exec(statement)
+}
+
+func addUsers(count int) {
+	if count < 1 {
+		count = 1
+	}
+	for i := 0; i < count; i++ {
+		statement := fmt.Sprintf("INSERT INTO users(name, age) VALUES('%s', %d)", ("User " + strconv.Itoa(i+1)), ((i + 1) * 10))
+		s.DB.Exec(statement)
+	}
 }
 
 func TestGetHeartbeatForCorrectUser(t *testing.T) {
