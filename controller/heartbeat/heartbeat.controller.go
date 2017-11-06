@@ -135,6 +135,7 @@ func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 }
 
 func (h *HeartbeatController) InitializeRoutes(r *mux.Router) {
+	logger.Info("Registered Heartbeat Routes")
 	s := r.PathPrefix("/hb-api").Subrouter()
 	s.HandleFunc("", h.GetHeartbeatsByUser).Methods("GET")
 	s.HandleFunc("", h.PushHeartbeat).Methods("POST")
