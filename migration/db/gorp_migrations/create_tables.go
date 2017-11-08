@@ -24,6 +24,10 @@ func CreateTables(db *sql.DB) {
 		log.Fatal("Failed to create track table. Exiting")
 	}
 
+	if err := updateToType(db, "users", "Location", "BLOB"); err != nil {
+		log.Fatal("Failed to create users table. Exiting")
+	}
+
 	if err := addPrimaryIDColumn(db, "heartbeat"); err != nil {
 		log.Fatal("Failed to add primary key column")
 	}

@@ -61,6 +61,15 @@ func TestGetNonExistentUser(t *testing.T) {
 	}
 }
 
+func TestGetUserById(t *testing.T) {
+	clearTable()
+	addUsers(2)
+	req, _ := http.NewRequest("GET", "/user/2", nil)
+	response := executeRequest(req)
+	checkResponseCode(t, http.StatusOK, response.Code)
+	fmt.Println(response.Body.String())
+}
+
 func TestCreateUser(t *testing.T) {
 	clearTable()
 

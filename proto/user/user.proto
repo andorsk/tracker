@@ -2,8 +2,17 @@ syntax =  "proto3";
 
 package user;
 
+import "tracker/proto/location/location.proto";
+
 message User {
 	int64 UserId = 1;
 	string Name = 2;
 	int32 Age = 3;
+	string Username = 4;
+	string Email = 5;
+	location.Location Location = 6;
+	string Phonenumber = 7;
+	string Facebook = 8;
+	string Linkedin = 9;
+	string Site = 10;
 }

@@ -1,1 +1,1 @@
-{"dB":{"type":"mysql","user":"root","password":"tpass","dBName":"rest_api_example"}}
+{"dB":{"type":"mysql","user":"root","password":"tpass","dBName":"rest_api_example"},"featureFlags":{"maps":true},"applicationSettings":{"googleapi":{"secretKey":"sk","accessKey":"ak"}}}

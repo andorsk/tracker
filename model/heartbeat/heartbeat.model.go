@@ -11,11 +11,13 @@ import (
 //Theres a dependency between a heartbeat and a heartbeat track. You cannot have a heartbeat point to a heartbeat tracka and the heartbeat track not exist.
 
 func Push(db *sql.DB, hb heartbeat.Heartbeat) error {
-	statement := fmt.Sprintf("INSERT INTO heartbeat (UserId, Location, Timestamp) VALUES ('%d', '%s', '%d')", hb.UserId, hb.Location, hb.Timestamp)
+
+	statement := fmt.Sprintf("INSERT INTO heartbeat (UserId, Location, Longitude, Latitude, Timestamp) VALUES ('%d', '%s', '%v', '%v', '%v')", hb.UserId, hb.Location, hb.Longitude, hb.Latitude, hb.Timestamp)
 
 	_, err := db.Exec(statement)
 
 	if err != nil {
+		log.Panic("Query was: ", statement)
 		log.Panic("Failed to push heartbeat to model:", err.Error())
 		return nil
 	}

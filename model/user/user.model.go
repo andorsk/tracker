@@ -3,6 +3,9 @@ package user
 import (
 	"database/sql"
 	"fmt"
+	"log"
+	"strconv"
+	"tracker/proto/location"
 	umodel "tracker/proto/user"
 )
 
@@ -55,13 +58,30 @@ func (u *UserModelInterface) Get(db *sql.DB, id int64) (umodel.User, error) {
 	return user, nil
 }
 
-func Get(db *sql.DB, id int64) (umodel.User, error) {
-	statement := fmt.Sprintf("SELECT * FROM users WHERE UserId=%d", id)
-	var user umodel.User
+func GetByUserId(db *sql.DB, val int64) (umodel.User, error) {
+	strval := strconv.FormatInt(val, 10)
+	return Get(db, "UserId", strval)
+}
 
-	if err := db.QueryRow(statement).Scan(&user.UserId, &user.Name, &user.Age); err != nil {
+func Get(db *sql.DB, field, val string) (umodel.User, error) {
+
+	var loc location.Location
+	var uname, email, phone, fb, linkedin, site sql.NullString
+
+	statement := fmt.Sprintf("SELECT * FROM users WHERE %s=%s", field, val)
+	var user umodel.User
+	fmt.Println("statement is ", statement)
+	if err := db.QueryRow(statement).Scan(&user.UserId, &user.Name, &user.Age, &uname, &email, &loc, &phone, &fb, &linkedin, &site); err != nil {
+		log.Panic("Failed to query with ", err, " statement was \n ", statement)
 		return user, err
 	}
+
+	user.Username = uname
+	user.Email = email
+	user.Phonenumber = phone
+	user.Facebook = fb
+	user.Linkedin = linkedin
+	user.Site = site
 
 	return user, nil
 }

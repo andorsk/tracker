@@ -56,7 +56,7 @@ func TestGetHeartbeatForIncorrectUser(t *testing.T) {
 func TestAddHeartbeatToNonExistentUser(t *testing.T) {
 	clearTable()
 
-	jsonStr := fmt.Sprintf(`{"latitude": %v, "longitude": %v, "timestamp":%v, "userId": %v})`, 1, 1, 1, 45)
+	jsonStr := fmt.Sprintf(`{"Latitude": %v, "Longitude": %v, "Timestamp":%v, "UserId": %v})`, 1, 1, 1, 45)
 	payload := []byte(jsonStr)
 	req, _ := http.NewRequest("POST", "/hb-api", bytes.NewBuffer(payload))
 	response := executeRequest(req)
@@ -64,12 +64,34 @@ func TestAddHeartbeatToNonExistentUser(t *testing.T) {
 }
 
 func TestAddHeartbeatToExistent(t *testing.T) {
-	addUsers(1)
-	jsonStr := fmt.Sprintf(`{"latitude": %v, "longitude": %v, "timestamp":%v, "userId": %v})`, 1, 1, 1, 1)
+	addUsers(3)
+
+	var lat, lng, tt, id float64 = 5.0, 10.0, 10.0, 3.0
+	jsonStr := fmt.Sprintf(`{"Latitude": %v, "Longitude": %v, "Timestamp":%v, "UserId": %v})`, lat, lng, tt, id)
 	payload := []byte(jsonStr)
 	req, _ := http.NewRequest("POST", "/hb-api", bytes.NewBuffer(payload))
 	response := executeRequest(req)
 	checkResponseCode(t, http.StatusCreated, response.Code)
+
+	var m map[string]interface{}
+
+	json.Unmarshal(response.Body.Bytes(), &m)
+
+	if m["Latitude"] != lat {
+		t.Errorf("Error. Latitude not equal to %v. Got %v", lat, m["Latitude"])
+	}
+
+	if m["Longitude"] != lng {
+		t.Errorf("Error. Longitude is not equal to %v. Got %v", lat, m["Longitude"])
+	}
+
+	if m["Timestamp"] != tt {
+		t.Errorf("Error. Timetsamp is not equal to %v. Got %v", tt, m["Timestamp"])
+	}
+
+	if m["UserId"] != id {
+		t.Errorf("Error. Id not equal to %v. Got %v", id, m["UserId"])
+	}
 
 }
 func TestAddHeartbeatAgainWithAnalyticThere(t *testing.T) {
@@ -145,4 +167,10 @@ func clearTable() {
 	s.DB.Exec("DELETE FROM heartbeat")
 	s.DB.Exec("ALTER TABLE heartbeat AUTO_INCREMENT = 1")
 	s.DB.Exec("DELETE FROM tracks")
+	clearUsers()
+}
+
+func clearUsers() {
+	s.DB.Exec("DELETE FROM users")
+	s.DB.Exec("ALTER TABLE users AUTO_INCREMENT = 1")
 }

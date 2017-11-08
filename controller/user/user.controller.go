@@ -47,7 +47,7 @@ func (a *UserController) getUser(w http.ResponseWriter, r *http.Request) {
 	}
 	u := umodel.User{UserId: id}
 
-	_, err = umi.Get(a.DB, id)
+	_, err = umi.GetByUserId(a.DB, id)
 
 	if err != nil {
 		switch err {

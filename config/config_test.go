@@ -50,6 +50,9 @@ func TestConfigReader(t *testing.T) {
 
 	pass := "tpass"
 	conf.DB = &config.DB_CONFIG{sampletype, sampleuser, pass, sampledb}
+	conf.FeatureFlags = &config.FeatureFlags{Maps: true}
+	conf.ApplicationSettings = &config.ApplicationSettings{}
+	conf.ApplicationSettings.Googleapi = &config.GoogleAPI{SecretKey: "sk", AccessKey: "ak"}
 	json, _ := Config2Json(conf)
 	JsonWriter(json, outfile)
 

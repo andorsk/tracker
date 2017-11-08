@@ -1,1 +1,17 @@
-{"dB":{"type":"mysql","user":"root","password":"c0raline","dBName":"rest_api_example"}}
+{
+	"dB": {
+		"type": "mysql",
+		"user": "root",
+		"password": "c0raline",
+		"dBName": "rest_api_example"
+	},
+	"featureFlags": {
+		"maps": true
+	},
+	"applicationSettings": {
+		"googleapi": {
+			"secretKey": "AIzaSyAN_lsomq0N3e39MpmbS5_UF6vi_rpfokE",
+			"accessKey": "AIzaSyAN_lsomq0N3e39MpmbS5_UF6vi_rpfokE"
+		}
+	}
+}

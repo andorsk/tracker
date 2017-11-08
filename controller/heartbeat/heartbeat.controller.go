@@ -69,14 +69,14 @@ func (h *HeartbeatController) PushHeartbeat(w http.ResponseWriter, r *http.Reque
 	defer r.Body.Close()
 
 	if h.checkUserExists(w, hb.UserId) == false {
-		logger.Warning("User does not exist. Returning")
+		logger.Warning("User does not exist. Failed to push heartbeat")
 		respondWithError(w, http.StatusNotFound, "User Not Found")
 		return
 	}
 
 	_, err := h.getLatestUUID(hb)
 	if err != nil {
-		logger.Warning("Np Track Associated with User. Creating New Track")
+		logger.Warning("No track found. Creating tracks....")
 		h.addHeartbeatTrack(hb)
 	}
 
@@ -88,7 +88,6 @@ func (h *HeartbeatController) PushHeartbeat(w http.ResponseWriter, r *http.Reque
 	respondWithJSON(w, http.StatusCreated, hb)
 }
 
-//TODO
 func (h *HeartbeatController) checkUserExists(w http.ResponseWriter, id int64) bool {
 	_, err := umi.Get(h.DB, id)
 	if err != nil {
@@ -107,7 +106,6 @@ func (h *HeartbeatController) addHeartbeatTrack(hb phb.Heartbeat) {
 	h.DB.Exec(statement)
 }
 
-//TODO
 func (h *HeartbeatController) getLatestUUID(hb phb.Heartbeat) (*puid.UUID, error) {
 
 	var heartbeats []phb.HeartbeatTrack

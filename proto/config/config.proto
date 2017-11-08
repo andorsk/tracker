@@ -4,19 +4,37 @@ package config;
 
 message Config {
 	DB_CONFIG DB = 1;
-	USER_CONFIG USER = 2; 
+	USER_CONFIG USER = 2;
+	FeatureFlags FeatureFlags = 3;
+	ApplicationSettings ApplicationSettings = 4;
 }
 
 message USER_CONFIG {
 	string Name = 1; 
 	string Address = 2;
 	string Address2 = 3;
-	int64 Last_Seen = 4; 
+	int64 Last_Seen = 4;
 }
+
 
 message DB_CONFIG {
 	string Type = 1;
 	string User = 2;
 	string Password = 3;
 	string DBName = 4;
+}
+
+message FeatureFlags {
+	bool Maps = 1;
+}
+
+message ApplicationSettings {
+	GoogleAPI googleapi = 1; 
+}
+
+message GoogleAPI {
+	string SecretKey = 1;
+	string AccessKey = 2;
+	string User = 3;
+	string URL = 4;
 }
