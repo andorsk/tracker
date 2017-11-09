@@ -67,13 +67,12 @@ func TestGetUserById(t *testing.T) {
 	req, _ := http.NewRequest("GET", "/user/2", nil)
 	response := executeRequest(req)
 	checkResponseCode(t, http.StatusOK, response.Code)
-	fmt.Println(response.Body.String())
 }
 
 func TestCreateUser(t *testing.T) {
 	clearTable()
 
-	payload := []byte(`{"Name": "test user", "Age": 30}`)
+	payload := []byte(`{"Name": "test user", "Age": 30, "Username" : "20", "Email" : "test@test.com"}`)
 
 	req, _ := http.NewRequest("POST", "/create", bytes.NewBuffer(payload))
 	response := executeRequest(req)

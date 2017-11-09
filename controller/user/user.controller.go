@@ -34,7 +34,6 @@ func (a *UserController) createUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Println(u)
 	respondWithJSON(w, http.StatusCreated, u)
 }
 

@@ -3,22 +3,31 @@ package user
 import (
 	"database/sql"
 	"fmt"
-	"log"
+	"reflect"
 	"strconv"
-	"tracker/proto/location"
 	umodel "tracker/proto/user"
+
+	gorp "gopkg.in/gorp.v2"
 )
 
 type UserModelInterface struct {
 	ObjectModelInterface interface{}
 }
 
+type User struct {
+}
+
 func Push(db *sql.DB, u *umodel.User) error {
 
-	statement := fmt.Sprintf("INSERT INTO users(Name, Age) VALUES ('%s', '%d')", u.Name, u.Age)
-	_, err := db.Exec(statement)
+	dbmap := &gorp.DbMap{Db: db, Dialect: gorp.MySQLDialect{Engine: "InnoDB", Encoding: "UTF8"}}
+	dbmap.AddTableWithName(umodel.User{}, "users")
+	fmt.Println("U is ", u)
+	err := dbmap.Insert(u)
+	//statement := fmt.Sprintf("INSERT INTO users(Name, Age) VALUES  ('%s', '%d')", u.Name, u.Age)
+	//_, err := db.Exec(statement)
 
 	if err != nil {
+		fmt.Println("Failed to insert")
 		return nil
 	}
 
@@ -39,7 +48,6 @@ func Update(db *sql.DB, u *umodel.User) error {
 func (u *UserModelInterface) Get(db *sql.DB, id int64) (umodel.User, error) {
 	statement := fmt.Sprintf("SELECT * FROM users where UserId = %d", id)
 	row, err := db.Query(statement)
-
 	if err != nil {
 		return umodel.User{}, err
 	}
@@ -65,25 +73,33 @@ func GetByUserId(db *sql.DB, val int64) (umodel.User, error) {
 
 func Get(db *sql.DB, field, val string) (umodel.User, error) {
 
-	var loc location.Location
-	var uname, email, phone, fb, linkedin, site sql.NullString
+	var uname, loc, email, phone, fb, linkedin, site sql.NullString
 
 	statement := fmt.Sprintf("SELECT * FROM users WHERE %s=%s", field, val)
 	var user umodel.User
-	fmt.Println("statement is ", statement)
+
 	if err := db.QueryRow(statement).Scan(&user.UserId, &user.Name, &user.Age, &uname, &email, &loc, &phone, &fb, &linkedin, &site); err != nil {
-		log.Panic("Failed to query with ", err, " statement was \n ", statement)
 		return user, err
 	}
 
-	user.Username = uname
-	user.Email = email
-	user.Phonenumber = phone
-	user.Facebook = fb
-	user.Linkedin = linkedin
-	user.Site = site
-
+	addIfNotNil(user.Location, loc)
+	addIfNotNil(user.Username, uname)
+	addIfNotNil(user.UserId, user.UserId)
+	addIfNotNil(user.Username, uname)
+	addIfNotNil(user.Email, email)
+	addIfNotNil(user.Phonenumber, phone)
+	addIfNotNil(user.Facebook, fb)
+	addIfNotNil(user.Linkedin, linkedin)
+	addIfNotNil(user.Site, site)
 	return user, nil
+}
+
+func addIfNotNil(place, vv interface{}) {
+	scan := reflect.TypeOf((*sql.Scanner)(nil)).Elem()
+	uses := !reflect.PtrTo(reflect.TypeOf(vv)).Implements(scan)
+	if uses {
+		place = vv
+	}
 }
 
 func GetUsers(db *sql.DB, start, count int) ([]umodel.User, error) {

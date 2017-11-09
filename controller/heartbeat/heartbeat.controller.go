@@ -57,6 +57,7 @@ func (h *HeartbeatController) GetHeartbeatsByUser(w http.ResponseWriter, r *http
 	respondWithJSON(w, http.StatusOK, heartbeats)
 }
 
+//TODO: Check if it's an invalid heartbeat.
 func (h *HeartbeatController) PushHeartbeat(w http.ResponseWriter, r *http.Request) {
 
 	dec := json.NewDecoder(r.Body)
@@ -89,7 +90,7 @@ func (h *HeartbeatController) PushHeartbeat(w http.ResponseWriter, r *http.Reque
 }
 
 func (h *HeartbeatController) checkUserExists(w http.ResponseWriter, id int64) bool {
-	_, err := umi.Get(h.DB, id)
+	_, err := umi.GetByUserId(h.DB, id)
 	if err != nil {
 		return false
 	}
@@ -104,6 +105,16 @@ func (h *HeartbeatController) addHeartbeatTrack(hb phb.Heartbeat) {
 	}
 	statement := fmt.Sprintf("INSERT INTO tracks(Uuid, Starttime, UserId) VALUES ('%v', '%v', '%v')", uuidst, hb.Timestamp, hb.UserId)
 	h.DB.Exec(statement)
+}
+
+func AddHeartbeatTrack(db *sql.DB, hb phb.Heartbeat) {
+
+	uuidst, err := uuid.NewUUIDString()
+	if err != nil {
+		logger.Panic("Failed to Create UUID")
+	}
+	statement := fmt.Sprintf("INSERT INTO tracks(Uuid, Starttime, UserId) VALUES ('%v', '%v', '%v')", uuidst, hb.Timestamp, hb.UserId)
+	db.Exec(statement)
 }
 
 func (h *HeartbeatController) getLatestUUID(hb phb.Heartbeat) (*puid.UUID, error) {

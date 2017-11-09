@@ -12,7 +12,7 @@ import (
 
 func Push(db *sql.DB, hb heartbeat.Heartbeat) error {
 
-	statement := fmt.Sprintf("INSERT INTO heartbeat (UserId, Location, Longitude, Latitude, Timestamp) VALUES ('%d', '%s', '%v', '%v', '%v')", hb.UserId, hb.Location, hb.Longitude, hb.Latitude, hb.Timestamp)
+	statement := fmt.Sprintf("INSERT INTO heartbeat (UserId, Location, Longitude, Latitude, Timestamp, Altitude) VALUES ('%d', '%s', '%v', '%v', '%v', '%v')", hb.UserId, hb.Location, hb.Longitude, hb.Latitude, hb.Timestamp, hb.Altitude)
 
 	_, err := db.Exec(statement)
 
