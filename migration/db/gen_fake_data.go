@@ -31,17 +31,15 @@ func genFakeHeartbeats(count int) {
 				Longitude: float64(jf + 50),
 				Latitude:  float64(jf + 50),
 				Altitude:  10,
+				UserId:    int64(i),
 			}
 
 			if j == 0 {
 				hbc.AddHeartbeatTrack(s.DB, hb)
 			}
 			hmi.Push(s.DB, hb)
-
 		}
-
 	}
-
 }
 
 func genFakeUserData(count int) {
@@ -93,5 +91,5 @@ func main() {
 	initDB()
 	clearTables()
 	genFakeUserData(5)
-	genFakeHeartbeats(5)
+	genFakeHeartbeats(10)
 }
