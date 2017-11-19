@@ -1,6 +1,20 @@
+<!--
+www.henosisknot.com 
+API Query based upon User ID returns object: 
+
+[{
+  "UUID" : 1234,
+  "Heartbeats": [
+    {Longitute: xx,
+    Latitude: xx,
+    OtherParams..,}, 
+},
+{...}
+]
+
+-->
 <html>
 {{define "map_layout"}}
-
 <head>
   <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
@@ -19,6 +33,7 @@
 
 <body>
 <div id="map"></div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     
 <script>
 
@@ -27,40 +42,69 @@ var testRequestURL = "http://localhost:8080/hb-api?UserId=1";
 var xhttp = new XMLHttpRequest();
 var sampleMarkers = [{Latitude: 50, Longitude: 50}, 
                     {Latitude: 51, Longitude: 51}]
+var test;
 
-requestData(testRequestURL, loadMarkerData)
+$(window).on('load', function(){
+  requestData(testRequestURL, trackLoopAction)
+});
+
 
 function requestData(url, func){
   xhttp.onreadystatechange = function(){
-    console.log("Requesting data")
+    console.log("Requesting data...")
     if(this.readyState = 4 && this.status == 200){
          func(xhttp);
     } else {
-        console.log("Bad request");
+        console.error("This was a bad request at url " + url);
     }};
     xhttp.open("GET", url, true)
     xhttp.send()
 }
 
+function parseResponseData(xhttp){
+  var response = xhttp.responseText
+  if(response) {
+    try{
+      var jsondata = JSON.parse(response);
+      return jsondata;
+    } catch(e){
+      console.error("Error converting data to JSON.")
+      alert("There was an error processing the data. Sorry! Try reloading or contact andor@hensosisknot.com if the problem persists.")
+      return null;
+    }
+  }
+}
+
+//Loops through the tracks. Process individual markers.
+function trackLoopAction(xhttp){
+   var tracks = parseResponseData(xhttp);
+   console.log("Tracks are ", tracks)
+   try{
+      for(i=0; i < tracks.length; i++){
+          loadMarkerData(tracks[i].Heartbeats)
+      }
+    } catch(e){
+    console.error("Error rendering  tracks " + e)
+   // alert("There was an error processing the data. Sorry! Try reloading or contact andor@hensosisknot.com if the problem persists.")
+   }
+}
+
 //Pass JSON Maker Object. 
-function loadMarkerData(xhttp){
+function loadMarkerData(markers){
   console.log("Loading Marker Data");
-  var markers = xhttp.responseText;
   if(markers) {
     try{
-       var jmarkers = JSON.parse(markers);
-       for(i = 0; i < sampleMarkers.length; i++){
-           addMarker(sampleMarkers[i]);
+       for(i = 0; i < markers.length; i++){
+           addMarker(markers[i]);
         }
     } catch(e){
-      console.error("Error Adding Maker. Reason: " + e);
+      console.error("Error Adding Marker. Reason: " + e);
     }
   }
 }
 
 //Add Marker Object. 
 function addMarker(marker){
-  console.log("Adding Marker " + marker)
   var m = new google.maps.Marker({
     position: new google.maps.LatLng(marker.Latitude, marker.Longitude),
     map: map
