@@ -7,8 +7,7 @@ import "tracker/proto/uuid/uuid.proto";
 
 //TODO:Using Sequential ID not UUID. Potentially redesign. Model will be time index
 message Heartbeat {
-	int64 Timestamp = 1;
-	int32 Offset = 2; //Theoretically we only need this 
+	int64 Timestamp = 1; 
  	location.Location Location = 3;
 	int64 UserId = 4;
 	double Longitude = 5;
@@ -20,5 +19,6 @@ message HeartbeatTrack {
 	uuid.UUID Uuid = 1;
 	repeated Heartbeat Heartbeats = 2;
 	int64 Starttime = 3;
-	int64 UserId = 4; 
+	int64 Endtime = 4;
+	int64 UserId = 5; 
 }
