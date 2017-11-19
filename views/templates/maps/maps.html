@@ -36,13 +36,12 @@ API Query based upon User ID returns object:
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     
 <script>
-
 var map;
 var testRequestURL = "http://localhost:8080/hb-api?UserId=1";
 var xhttp = new XMLHttpRequest();
 var sampleMarkers = [{Latitude: 50, Longitude: 50}, 
                     {Latitude: 51, Longitude: 51}]
-var test;
+var DEBUG = false;
 
 $(window).on('load', function(){
   requestData(testRequestURL, trackLoopAction)
@@ -93,10 +92,15 @@ function trackLoopAction(xhttp){
 function loadMarkerData(markers){
   console.log("Loading Marker Data");
   if(markers) {
+
+    //shorten this for testing purposes 
+    if (DEBUG) {markers = markers.slice(0, 30);};
     try{
        for(i = 0; i < markers.length; i++){
            addMarker(markers[i]);
         }
+         map.panTo(new google.maps.LatLng(markers[markers.length - 1].Latitude, markers[markers.length - 1].Longitude));
+
     } catch(e){
       console.error("Error Adding Marker. Reason: " + e);
     }
@@ -109,7 +113,6 @@ function addMarker(marker){
     position: new google.maps.LatLng(marker.Latitude, marker.Longitude),
     map: map
   });
-  map.panTo(m.position);
 }
 
 function initMap(){
