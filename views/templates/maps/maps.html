@@ -1,0 +1,83 @@
+<html>
+{{define "map_layout"}}
+
+<head>
+  <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+  <title> Andor Tracker </title>
+  <style>
+      #map {
+        height: 100%;
+      }
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+</head>
+
+<body>
+<div id="map"></div>
+    
+<script>
+
+var map;
+var testRequestURL = "http://localhost:8080/hb-api?UserId=1";
+var xhttp = new XMLHttpRequest();
+var sampleMarkers = [{Latitude: 50, Longitude: 50}, 
+                    {Latitude: 51, Longitude: 51}]
+
+requestData(testRequestURL, loadMarkerData)
+
+function requestData(url, func){
+  xhttp.onreadystatechange = function(){
+    console.log("Requesting data")
+    if(this.readyState = 4 && this.status == 200){
+         func(xhttp);
+    } else {
+        console.log("Bad request");
+    }};
+    xhttp.open("GET", url, true)
+    xhttp.send()
+}
+
+//Pass JSON Maker Object. 
+function loadMarkerData(xhttp){
+  console.log("Loading Marker Data");
+  var markers = xhttp.responseText;
+  if(markers) {
+    try{
+       var jmarkers = JSON.parse(markers);
+       for(i = 0; i < sampleMarkers.length; i++){
+           addMarker(sampleMarkers[i]);
+        }
+    } catch(e){
+      console.error("Error Adding Maker. Reason: " + e);
+    }
+  }
+}
+
+//Add Marker Object. 
+function addMarker(marker){
+  console.log("Adding Marker " + marker)
+  var m = new google.maps.Marker({
+    position: new google.maps.LatLng(marker.Latitude, marker.Longitude),
+    map: map
+  });
+  map.panTo(m.position);
+}
+
+function initMap(){
+    map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 8,
+          center: {lat: 40.731, lng: -73.997}
+      });
+}
+</script>
+<script async defer
+    src="https://maps.googleapis.com/maps/api/js?key={{.API_KEY}}&callback=initMap">
+</script>
+</body>
+</html>
+{{end}}
