@@ -30,13 +30,20 @@ type HeartbeatController struct {
 func (h *HeartbeatController) GetHeartbeatsByUser(w http.ResponseWriter, r *http.Request) {
 
 	vars := r.URL.Query()
-	_, err := strconv.Atoi(vars["UserId"][0])
+	if len(vars["UserId"]) == 0 {
+		logger.Error("Error in request", r.URL.Query)
+		return
+	}
+	uid, err := strconv.Atoi(vars["UserId"][0])
+	fmt.Println("Getting user id ", uid)
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid User Id. Please make sure to specify number for user id")
+		return
 	}
 
 	if len(vars["UserId"]) > 1 {
 		respondWithError(w, http.StatusBadRequest, "Please make sure to only have one user id")
+		return
 	}
 
 	var heartbeats []phb.HeartbeatTrack
@@ -82,7 +89,7 @@ func (h *HeartbeatController) PushHeartbeat(w http.ResponseWriter, r *http.Reque
 	}
 
 	if err := hmi.Push(h.DB, hb); err != nil {
-		log.Panic("Failed to push heartbeat to database")
+		logger.Warning("Failed to push heartbeat to database")
 		respondWithError(w, http.StatusInternalServerError, "Failed to push heartbeat")
 		return
 	}
@@ -127,9 +134,7 @@ func (h *HeartbeatController) getLatestUUID(hb phb.Heartbeat) (*puid.UUID, error
 	if err != nil {
 		return &puid.UUID{}, err
 	}
-
 	return heartbeats[len(heartbeats)-1].Uuid, nil
-
 }
 
 func respondWithError(w http.ResponseWriter, code int, message string) {

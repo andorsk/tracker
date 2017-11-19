@@ -117,7 +117,7 @@ func addUsers(count int) {
 	}
 }
 
-func TestGetHeartbeatForCorrectUser(t *testing.T) {
+func TestGetHeartbeatTrackForCorrectUser(t *testing.T) {
 	clearTable()
 	addHeartBeat()
 	req, _ := http.NewRequest("GET", "/hb-api?UserId=1", nil)
@@ -136,6 +136,8 @@ func TestGetHeartbeatForCorrectUser(t *testing.T) {
 	if len(tracks) > 1 {
 		t.Error("Only supposed to be one entry. Continue")
 	}
+
+	fmt.Println("Tracks are ", tracks)
 	for _, track := range tracks {
 		if track.UserId != 1 {
 			t.Error("Failed to reqeust correct user id")
@@ -147,6 +149,9 @@ func TestGetHeartbeatForCorrectUser(t *testing.T) {
 }
 
 func TestMalformedPush(t *testing.T) {
+}
+
+func TestDuplicatePush(t *testing.T) {
 }
 
 func executeRequest(req *http.Request) *httptest.ResponseRecorder {
