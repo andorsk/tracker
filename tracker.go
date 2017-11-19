@@ -21,7 +21,7 @@ func Init() {
 
 	fmt.Println("DB is ", conf.GetDB().DBName)
 	s.Initialize(conf.GetDB().User, conf.GetDB().Password, conf.GetDB().DBName)
-	mc := controller.MasterController{DB: s.DB, Router: s.Router}
+	mc := controller.MasterController{DB: s.DB, Router: s.Router, Config: conf}
 	mc.InitializeRoutes(s.Router)
 
 }

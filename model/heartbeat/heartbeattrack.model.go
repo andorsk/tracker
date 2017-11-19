@@ -2,16 +2,21 @@ package heartbeat
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"log"
 	"reflect"
 	"tracker/proto/heartbeat"
 	puuid "tracker/proto/uuid"
+
+	logger "github.com/sirupsen/logrus"
 )
 
-//Theres a dependency between a heartbeat and a heartbeat track. You cannot have a heartbeat point to a heartbeat tracka and the heartbeat track not exist.
-
 func Push(db *sql.DB, hb heartbeat.Heartbeat) error {
+
+	if checkIfValueExists(db, hb) {
+		return errors.New("Duplicate Entry")
+	}
 
 	statement := fmt.Sprintf("INSERT INTO heartbeat (UserId, Location, Longitude, Latitude, Timestamp, Altitude) VALUES ('%d', '%s', '%v', '%v', '%v', '%v')", hb.UserId, hb.Location, hb.Longitude, hb.Latitude, hb.Timestamp, hb.Altitude)
 
@@ -24,6 +29,25 @@ func Push(db *sql.DB, hb heartbeat.Heartbeat) error {
 	}
 
 	return nil
+}
+
+func checkIfValueExists(db *sql.DB, hb heartbeat.Heartbeat) bool {
+	statement := fmt.Sprintf("SELECT UserId, Longitude,Latitude, Timestamp from heartbeat where UserId = %d and Longitude = %v and Latitude = %v and Timestamp = %v", hb.UserId, hb.Longitude, hb.Latitude, hb.Timestamp)
+
+	var lng, lat float64
+	var userid, time int64
+
+	err := db.QueryRow(statement).Scan(&userid, &lng, &lat, &time)
+	switch {
+	case err == sql.ErrNoRows:
+		return false
+	case err != nil:
+		logger.Warning("Error Checking Entry ", err)
+	default:
+		logger.Warning("Skipping duplicate entry", lng, lat, userid, time)
+		return true
+	}
+	return true
 }
 
 func Get(db *sql.DB, column, criteria string) ([]heartbeat.HeartbeatTrack, error) {
@@ -67,8 +91,8 @@ func Get(db *sql.DB, column, criteria string) ([]heartbeat.HeartbeatTrack, error
 	if len(hbtracks) == 0 {
 		return nil, sql.ErrNoRows
 	}
-	fmt.Println("Returnning ", len(hbtracks), " heartbeat tracks")
-	fmt.Println("Running ", statement)
+
+	logger.Info("Executing statement: ", statement)
 	return hbtracks, nil
 }
 
@@ -83,14 +107,13 @@ func DeleteHeartbeats(db *sql.DB, id int) error {
 	return nil
 }
 
-//starttime and endtime.
 func GetHeartbeatsForTrack(db *sql.DB, hbt heartbeat.HeartbeatTrack) ([]*heartbeat.Heartbeat, error) {
 
 	endtime := hbt.Endtime
 	var statement string
 	var location sql.NullString
 	var altitude sql.NullFloat64
-	fmt.Println("endtime is ", endtime)
+
 	//needs to limit by endtime as well.
 	if endtime == 0 {
 		statement = fmt.Sprintf("SELECT * FROM heartbeat WHERE UserId = %v AND Timestamp > %v ", hbt.UserId, hbt.Starttime)
@@ -98,7 +121,6 @@ func GetHeartbeatsForTrack(db *sql.DB, hbt heartbeat.HeartbeatTrack) ([]*heartbe
 		statement = fmt.Sprintf("SELECT * FROM heartbeat WHERE UserId = %v AND Timestamp >= %v AND Timestamp <= %v ", hbt.UserId, hbt.Starttime, hbt.Endtime)
 	}
 
-	fmt.Println("Running statment ", statement)
 	rows, err := db.Query(statement)
 	var id int64
 	var heartbeats []*heartbeat.Heartbeat
